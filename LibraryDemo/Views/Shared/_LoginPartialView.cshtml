@@ -1,0 +1,21 @@
+﻿@model LoginModel
+
+<input type="hidden" name="returnUrl" value="@ViewBag.returnUrl"/>
+<div class="form-group">   
+    <label asp-for="Account"></label>
+    <input asp-for="Account" class="form-control" placeholder="请输入你的账号(学号) / 邮箱 / 手机号"/>
+</div>
+<div class="form-group">   
+    <label asp-for="Password"></label>
+    <input asp-for="Password" class="form-control" placeholder="请输入你的密码"/>
+</div>
+<div class="form-group">
+    <label>登录方式</label>
+    <select asp-for="LoginType">
+        <option disabled value="">登录方式</option>
+        <LoginType login-type="@Enum.GetNames(typeof(LoginType))"></LoginType>
+    </select>
+</div>
+<input type="submit" class="btn btn-primary"/>
+<input type="reset" class="btn btn-primary"/>
+<a class="btn btn-success" asp-action="Retrieve" asp-controller="PasswordRetriever">找回密码</a>

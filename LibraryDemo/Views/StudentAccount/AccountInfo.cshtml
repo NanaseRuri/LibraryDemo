@@ -1,0 +1,14 @@
+﻿@model Dictionary<string, object>
+@{
+    ViewData["Title"] = "AccountInfo";
+}
+<h2>账户信息</h2>
+<ul>
+    @foreach (var info in Model)
+    {
+        <li>@info.Key: @Model[info.Key]</li>
+    }
+</ul>
+<br />
+<a class="btn btn-danger" asp-action="Logout">登出</a>
+<a class="btn btn-primary" asp-action="ModifyPassword">修改密码</a>

@@ -1,0 +1,23 @@
+﻿@model RetrieveModel
+
+<h2>找回密码</h2>
+<hr/>
+
+<label class="text-danger">@ViewBag.Error</label>
+
+<form asp-action="RetrievePassword" asp-controller="PasswordRetriever" method="post">
+    <div class="form-group">
+        <input asp-for="Account" class="form-control" placeholder="请输入你的邮箱 / 账号 / 手机号"/>        
+    </div>
+    <br/>
+    <div class="form-group">
+        <label>找回方式</label>
+        <select asp-for="RetrieveWay">
+            <option disabled value="">找回方式: </option>
+            <LoginType login-type="@Enum.GetNames(typeof(RetrieveType))"></LoginType>
+        </select>
+    </div>
+    <br/>
+    <input class="btn btn-primary" type="submit" value="确认"/>
+    <input class="btn btn-primary" type="reset"/>
+</form>

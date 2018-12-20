@@ -1,0 +1,14 @@
+﻿@model Dictionary<string,object>
+@{
+    ViewData["Title"] = "AccountInfo";
+}
+
+<h2>AccountInfo</h2>
+
+<ul>
+    @foreach (var info in Model)
+    {
+        <li>@info.Key: @Model[info.Key]</li>
+    }
+    
+</ul>

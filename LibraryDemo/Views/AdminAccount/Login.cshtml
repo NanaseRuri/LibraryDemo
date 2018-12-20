@@ -1,0 +1,12 @@
+﻿@model LoginModel
+@{
+    ViewData["Title"] = "AdminIndex";
+}
+
+<h2>Login</h2>
+<br />
+<div class="text-danger" asp-validation-summary="All"></div>
+<br />
+<form asp-action="Login" method="post">
+    @await Html.PartialAsync("_LoginPartialView", Model)
+</form>
