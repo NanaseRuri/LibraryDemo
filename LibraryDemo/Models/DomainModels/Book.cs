@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using LibraryDemo.Models.DomainModels;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
@@ -11,7 +12,7 @@ namespace LibraryDemo.Models.DomainModels
 {
     /// <summary>
     /// 用于借阅的书籍信息
-    /// </summary>
+    /// </summary>    
     public class Book
     {                                
         /// <summary>
@@ -37,7 +38,7 @@ namespace LibraryDemo.Models.DomainModels
         /// 所在书架
         /// </summary>
         //public Bookshelf Bookshelf { get; set; }
-        public ICollection<BookMiddle> BookMiddles { get; set; }
+        public Bookshelf Bookshelf { get; set; }
 
         /// <summary>
         /// 借出时间
@@ -57,11 +58,14 @@ namespace LibraryDemo.Models.DomainModels
         /// <summary>
         /// 借阅状态
         /// </summary>
-        public BookState State { get; set; }
+        public BookState State { get; set; }        
 
         /// <summary>
         /// 持有者，指定外键
         /// </summary>
         public Student Keeper { get; set; }
+
+        public string Location { get; set; }
+        public string Sort { get; set; }
     }
 }

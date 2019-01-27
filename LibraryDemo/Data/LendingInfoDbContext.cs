@@ -16,13 +16,6 @@ namespace LibraryDemo.Data
         public DbSet<Book> Books { get; set; }
         public DbSet<BookDetails> BooksDetail { get; set; }
         public DbSet<Bookshelf> Bookshelves { get; set; }
-        public DbSet<Student> Students { get; set; }
         public DbSet<RecommendedBook> RecommendedBooks { get; set; }
-        public DbSet<BookMiddle> BookMiddles { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<BookMiddle>().HasKey(t => new {t.BookId, t.BookshelfId});
-        }
     }
 }

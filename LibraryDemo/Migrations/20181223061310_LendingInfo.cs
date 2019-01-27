@@ -1,8 +1,7 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace LibraryDemo.Migrations.LendingInfoDb
+namespace LibraryDemo.Migrations
 {
     public partial class LendingInfo : Migration
     {
@@ -29,8 +28,7 @@ namespace LibraryDemo.Migrations.LendingInfoDb
                 name: "Bookshelves",
                 columns: table => new
                 {
-                    BookshelfId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    BookshelfId = table.Column<int>(nullable: false),
                     Sort = table.Column<string>(nullable: false),
                     MinFetchNumber = table.Column<string>(nullable: false),
                     MaxFetchNumber = table.Column<string>(nullable: false),
@@ -59,7 +57,7 @@ namespace LibraryDemo.Migrations.LendingInfoDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "Student",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
@@ -85,7 +83,7 @@ namespace LibraryDemo.Migrations.LendingInfoDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.PrimaryKey("PK_Student", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,51 +94,37 @@ namespace LibraryDemo.Migrations.LendingInfoDb
                     ISBN = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     FetchBookNumber = table.Column<string>(nullable: true),
+                    BookshelfId = table.Column<int>(nullable: true),
                     BorrowTime = table.Column<DateTime>(nullable: true),
                     MatureTime = table.Column<DateTime>(nullable: true),
                     AppointedLatestTime = table.Column<DateTime>(nullable: true),
                     State = table.Column<int>(nullable: false),
-                    KeeperId = table.Column<string>(nullable: true)
+                    KeeperId = table.Column<string>(nullable: true),
+                    ImageData = table.Column<byte[]>(nullable: true),
+                    ImageMimeType = table.Column<string>(nullable: true),
+                    Location = table.Column<string>(nullable: true),
+                    Sort = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Books", x => x.BarCode);
                     table.ForeignKey(
-                        name: "FK_Books_Students_KeeperId",
+                        name: "FK_Books_Bookshelves_BookshelfId",
+                        column: x => x.BookshelfId,
+                        principalTable: "Bookshelves",
+                        principalColumn: "BookshelfId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Books_Student_KeeperId",
                         column: x => x.KeeperId,
-                        principalTable: "Students",
+                        principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "BookMiddles",
-                columns: table => new
-                {
-                    BookMiddleId = table.Column<int>(nullable: false),
-                    BookId = table.Column<string>(nullable: false),
-                    BookshelfId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookMiddles", x => new { x.BookId, x.BookshelfId });
-                    table.ForeignKey(
-                        name: "FK_BookMiddles_Books_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "BarCode",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BookMiddles_Bookshelves_BookshelfId",
-                        column: x => x.BookshelfId,
-                        principalTable: "Bookshelves",
-                        principalColumn: "BookshelfId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
-                name: "IX_BookMiddles_BookshelfId",
-                table: "BookMiddles",
+                name: "IX_Books_BookshelfId",
+                table: "Books",
                 column: "BookshelfId");
 
             migrationBuilder.CreateIndex(
@@ -152,7 +136,7 @@ namespace LibraryDemo.Migrations.LendingInfoDb
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BookMiddles");
+                name: "Books");
 
             migrationBuilder.DropTable(
                 name: "BooksDetail");
@@ -161,13 +145,10 @@ namespace LibraryDemo.Migrations.LendingInfoDb
                 name: "RecommendedBooks");
 
             migrationBuilder.DropTable(
-                name: "Books");
-
-            migrationBuilder.DropTable(
                 name: "Bookshelves");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "Student");
         }
     }
 }

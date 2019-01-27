@@ -1,0 +1,92 @@
+﻿@model LibraryDemo.Models.DomainModels.BookDetails
+
+@{
+    ViewData["Title"] = "EditBookDetails";
+}
+
+<script>
+    function preview(file) {
+        $(".image").addClass("hidden");
+        $('.preview').wrap("<div></div>");
+        $(".preview").removeClass("hidden");
+        if (file.files && file.files[0]){  
+            var reader = new FileReader();  
+            reader.onload = function(evt){
+                $('.preview').attr('src' , evt.target.result);
+            }    
+            reader.readAsDataURL(file.files[0]);  
+        }else{  
+            $('.preview').attr('src' , file.value);
+        }
+    }
+    window.onload = function() {
+        $("div>input").addClass("form-control");
+        var isbn = document.getElementById("ISBN");
+        isbn.setAttribute("readonly","true");
+    }
+</script>
+
+<h2>编辑书籍</h2>
+
+<form enctype="multipart/form-data" method="post">
+    <div class="panel-body">
+        <div class="form-group">
+            @Html.LabelFor(m=>m.ISBN)
+            @Html.EditorFor(m=>m.ISBN)
+        </div>              
+        <div class="form-group">
+            @Html.LabelFor(m => m.Name)
+            @Html.TextBoxFor(m => m.Name, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Author)
+            @Html.TextBoxFor(m => m.Author, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Press)
+            @Html.TextBoxFor(m => m.Press, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.FetchBookNumber)
+            @Html.TextBoxFor(m => m.FetchBookNumber, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.SoundCassettes)
+            @Html.TextBoxFor(m => m.SoundCassettes, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Description)
+            @Html.TextAreaFor(m => m.Description, new {@class = "form-control", rows = 5})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.PublishDateTime)
+            <div>@Html.EditorFor(m => m.PublishDateTime)</div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Version)
+            <div>@Html.EditorFor(m => m.Version)</div>
+        </div>
+        <div class="form-group">
+            <div style="position: relative;">
+                <label>Image</label>
+                <a class="btn" href="javascript:;">
+                    选择图片
+                    <input type="file" name="Image" size="40" accept="image/*"
+                           style="position: absolute; z-index: 2; top: 0; left: 0; filter: alpha(opacity=0); opacity: 0; background-color: transparent; color: transparent"
+                           onchange="preview(this)"/>
+                </a>
+                <img style="width: 150px;" class="hidden preview img-thumbnail">
+            </div>
+            @if (Model.ImageData == null)
+            {
+                <div class="form-control-static image">No Image</div>
+            }
+            else
+            {
+                <img class="img-thumbnail image" style="width: 150px;" src="@Url.Action("GetImage", "BookInfo", new {Model.ISBN})"/>
+            }
+        </div>
+        <br/>   
+        <input type="submit" class="btn btn-success"/>
+    </div>    
+</form>

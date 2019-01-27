@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ namespace LibraryDemo.Models.DomainModels
         /// 书架ID
         /// </summary>
         [Key]
+        //不自动增长
+        [DatabaseGenerated(DatabaseGeneratedOption.None)] 
         public int BookshelfId { get; set; }
 
         /// <summary>
@@ -37,7 +40,6 @@ namespace LibraryDemo.Models.DomainModels
         /// <summary>
         /// 全部藏书
         /// </summary>
-        //public ICollection<Book> Books { get; set; }
-        public ICollection<BookMiddle> BookMiddles { get; set; }
+        public ICollection<Book> Books { get; set; }
     }
 }

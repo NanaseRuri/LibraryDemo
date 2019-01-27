@@ -69,6 +69,14 @@ namespace LibraryDemo
             });
             services.AddSingleton<EmailSender>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                // Set a short timeout for easy testing.
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,6 +96,8 @@ namespace LibraryDemo
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseSession();
+
 
             app.UseMvc(routes =>
             {
@@ -96,6 +106,7 @@ namespace LibraryDemo
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
             StudentInitiator.InitialStudents(app.ApplicationServices).Wait();
+            BookInitiator.BookInitial(app.ApplicationServices).Wait();
         }
     }
 }

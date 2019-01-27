@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace LibraryDemo.Migrations.LendingInfoDb
+namespace LibraryDemo.Migrations
 {
     [DbContext(typeof(LendingInfoDbContext))]
     partial class LendingInfoDbContextModelSnapshot : ModelSnapshot
@@ -26,6 +26,8 @@ namespace LibraryDemo.Migrations.LendingInfoDb
 
                     b.Property<DateTime?>("AppointedLatestTime");
 
+                    b.Property<int?>("BookshelfId");
+
                     b.Property<DateTime?>("BorrowTime");
 
                     b.Property<string>("FetchBookNumber");
@@ -34,14 +36,20 @@ namespace LibraryDemo.Migrations.LendingInfoDb
 
                     b.Property<string>("KeeperId");
 
+                    b.Property<string>("Location");
+
                     b.Property<DateTime?>("MatureTime");
 
                     b.Property<string>("Name")
                         .IsRequired();
 
+                    b.Property<string>("Sort");
+
                     b.Property<int>("State");
 
                     b.HasKey("BarCode");
+
+                    b.HasIndex("BookshelfId");
 
                     b.HasIndex("KeeperId");
 
@@ -55,6 +63,15 @@ namespace LibraryDemo.Migrations.LendingInfoDb
 
                     b.Property<string>("Author")
                         .IsRequired();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("FetchBookNumber")
+                        .IsRequired();
+
+                    b.Property<byte[]>("ImageData");
+
+                    b.Property<string>("ImageMimeType");
 
                     b.Property<string>("Name")
                         .IsRequired();
@@ -73,26 +90,9 @@ namespace LibraryDemo.Migrations.LendingInfoDb
                     b.ToTable("BooksDetail");
                 });
 
-            modelBuilder.Entity("LibraryDemo.Models.DomainModels.BookMiddle", b =>
-                {
-                    b.Property<string>("BookId");
-
-                    b.Property<int>("BookshelfId");
-
-                    b.Property<int>("BookMiddleId");
-
-                    b.HasKey("BookId", "BookshelfId");
-
-                    b.HasIndex("BookshelfId");
-
-                    b.ToTable("BookMiddles");
-                });
-
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.Bookshelf", b =>
                 {
-                    b.Property<int>("BookshelfId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("BookshelfId");
 
                     b.Property<string>("Location")
                         .IsRequired();
@@ -183,27 +183,18 @@ namespace LibraryDemo.Migrations.LendingInfoDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("Students");
+                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.Book", b =>
                 {
+                    b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
+                        .WithMany("Books")
+                        .HasForeignKey("BookshelfId");
+
                     b.HasOne("LibraryDemo.Models.DomainModels.Student", "Keeper")
                         .WithMany("KeepingBooks")
                         .HasForeignKey("KeeperId");
-                });
-
-            modelBuilder.Entity("LibraryDemo.Models.DomainModels.BookMiddle", b =>
-                {
-                    b.HasOne("LibraryDemo.Models.DomainModels.Book", "Book")
-                        .WithMany("BookMiddles")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
-                        .WithMany("BookMiddles")
-                        .HasForeignKey("BookshelfId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
