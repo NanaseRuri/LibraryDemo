@@ -1,6 +1,6 @@
 ﻿@model LibraryDemo.Models.DomainModels.BookDetails
 @{
-    ViewData["Title"] = "AddBook";
+    ViewData["Title"] = "AddBookDetails";
 }
 
 <script>
@@ -17,7 +17,13 @@
         } else {
             $('.preview').attr('src', file.value);
         }
-    }    
+    }        
+    window.onbeforeunload = function () {
+        return "您的数据未保存，确定退出？";
+    }
+    function removeOnbeforeunload() {
+        window.onbeforeunload = "";
+    }
 </script>
 
 <h2>添加书籍</h2>
@@ -72,6 +78,6 @@
                 <img style="width: 150px;" class="hidden preview img-thumbnail">
             </div>
         </div>        
-        <input type="submit"/>
+        <input type="submit" onclick="removeOnbeforeunload()"/>
     </div>
 </form>

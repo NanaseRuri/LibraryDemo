@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryDemo.Migrations
 {
     [DbContext(typeof(LendingInfoDbContext))]
-    [Migration("20181226120548_addIma")]
-    partial class addIma
+    [Migration("20190129092401_addRange")]
+    partial class addRange
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,7 +28,7 @@ namespace LibraryDemo.Migrations
 
                     b.Property<DateTime?>("AppointedLatestTime");
 
-                    b.Property<int?>("BookshelfId");
+                    b.Property<int>("BookshelfId");
 
                     b.Property<DateTime?>("BorrowTime");
 
@@ -67,6 +67,9 @@ namespace LibraryDemo.Migrations
                         .IsRequired();
 
                     b.Property<string>("Description");
+
+                    b.Property<string>("FetchBookNumber")
+                        .IsRequired();
 
                     b.Property<byte[]>("ImageData");
 
@@ -189,7 +192,8 @@ namespace LibraryDemo.Migrations
                 {
                     b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
                         .WithMany("Books")
-                        .HasForeignKey("BookshelfId");
+                        .HasForeignKey("BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("LibraryDemo.Models.DomainModels.Student", "Keeper")
                         .WithMany("KeepingBooks")

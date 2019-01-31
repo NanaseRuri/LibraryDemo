@@ -338,7 +338,7 @@ namespace LibraryDemo.Infrastructure
                     {
                         Author = "毛泽东",
                         Name = "毛泽东选集. 第一卷",
-                        ISBN = "7-01-000914-7",
+                        ISBN = "7-01-000922-8",
                         Press = "人民出版社",
                         PublishDateTime = new DateTime(1991,1,1),
                         SoundCassettes = "340页 : 肖像 ; 19厘米",

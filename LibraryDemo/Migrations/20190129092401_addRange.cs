@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LibraryDemo.Migrations
 {
-    public partial class LendingInfo : Migration
+    public partial class addRange : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,9 +15,13 @@ namespace LibraryDemo.Migrations
                     Name = table.Column<string>(nullable: false),
                     Author = table.Column<string>(nullable: false),
                     Press = table.Column<string>(nullable: false),
+                    FetchBookNumber = table.Column<string>(nullable: false),
                     PublishDateTime = table.Column<DateTime>(nullable: false),
                     Version = table.Column<int>(nullable: false),
-                    SoundCassettes = table.Column<string>(nullable: true)
+                    SoundCassettes = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    ImageData = table.Column<byte[]>(nullable: true),
+                    ImageMimeType = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -94,14 +98,12 @@ namespace LibraryDemo.Migrations
                     ISBN = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     FetchBookNumber = table.Column<string>(nullable: true),
-                    BookshelfId = table.Column<int>(nullable: true),
+                    BookshelfId = table.Column<int>(nullable: false),
                     BorrowTime = table.Column<DateTime>(nullable: true),
                     MatureTime = table.Column<DateTime>(nullable: true),
                     AppointedLatestTime = table.Column<DateTime>(nullable: true),
                     State = table.Column<int>(nullable: false),
                     KeeperId = table.Column<string>(nullable: true),
-                    ImageData = table.Column<byte[]>(nullable: true),
-                    ImageMimeType = table.Column<string>(nullable: true),
                     Location = table.Column<string>(nullable: true),
                     Sort = table.Column<string>(nullable: true)
                 },
@@ -113,7 +115,7 @@ namespace LibraryDemo.Migrations
                         column: x => x.BookshelfId,
                         principalTable: "Bookshelves",
                         principalColumn: "BookshelfId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Books_Student_KeeperId",
                         column: x => x.KeeperId,

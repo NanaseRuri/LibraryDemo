@@ -1,0 +1,90 @@
+﻿    @using LibraryDemo.Models.DomainModels
+    @model BookEditModel
+
+    @{
+        ViewData["Title"] = "外借/阅览书籍信息";
+        Book temp = new Book();
+    }
+
+<script>
+    function confirmDelete() {
+        var barcodes = document.getElementsByName("barcodes");
+        var message="确认删除";
+        for (i in barcodes) {
+            if (barcodes[i].checked) {
+                var book = barcodes[i].parentElement.nextElementSibling.firstElementChild.innerHTML;
+                message=message+"《"+book+"》";
+            }
+        }
+        message = message + "?";
+        if (confirm(message) == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
+
+    <style type="text/css">
+        tr + tr {
+            border-top: thin solid gray;
+        }
+
+        td + td {
+            padding-left: 100px;
+        }
+
+        .container {
+            width: 1200px;
+        }
+    </style>
+
+    <h2>《@Model.BookDetails.Name》</h2>
+    <br />
+
+    @if (TempData["message"] != null)
+    {
+        <p style="font-size: large;color:red" >@TempData["message"]</p>
+        <br />
+        <br />
+    }
+
+    <form asp-action="RemoveBooks" method="post">
+        <div>
+            <a class="btn btn-primary" asp-action="AddBook" asp-route-isbn="@Model.BookDetails.ISBN">添加外借书籍</a>
+            <button type="submit" class="btn btn-danger" onclick="return confirmDelete()"> 删除外借书籍</button>
+        </div>
+        <br />
+        <input type="hidden" name="isbn" value="@Model.BookDetails.ISBN"/>
+        <table>
+            <tbody>
+            <tr>
+                <td></td>
+                <td>@Html.LabelFor(b => temp.BarCode)</td>
+                <td>@Html.LabelFor(b => temp.Bookshelf)</td>
+                <td>@Html.LabelFor(b => temp.BorrowTime)</td>
+                <td>@Html.LabelFor(b => temp.MatureTime)</td>
+                <td>@Html.LabelFor(b => temp.AppointedLatestTime)</td>
+                <td>@Html.LabelFor(b => temp.State)</td>
+                <td>@Html.LabelFor(b => temp.Keeper)</td>
+            </tr>
+                @if (Model.Books.ToList().Count == 0)
+                {
+                    <tr><td colspan="7">未有《@Model.BookDetails.Name》的外借/阅览书籍信息</td></tr>
+                }
+                @foreach (var book in Model.Books)
+                {
+                    <tr>
+                        <td><input type="checkbox" name="barcodes" value="@book.BarCode"/></td>
+                        <td><a asp-action="EditBook" asp-route-barcode="@book.BarCode">@Html.DisplayFor(b => book.BarCode)</a></td>
+                        <td>@Html.DisplayFor(b => book.BookshelfId)</td>
+                        <td>@Html.DisplayFor(b => book.BorrowTime)</td>
+                        <td>@Html.DisplayFor(b => book.MatureTime)</td>
+                        <td>@Html.DisplayFor(b => book.AppointedLatestTime)</td>
+                        <td>@Html.DisplayFor(b => book.State)</td>
+                        <td>@Html.DisplayFor(b => book.Keeper.Name)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>

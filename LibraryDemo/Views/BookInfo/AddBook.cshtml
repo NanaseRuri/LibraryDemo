@@ -1,0 +1,88 @@
+﻿    @using LibraryDemo.Models.DomainModels
+    @model LibraryDemo.Models.DomainModels.Book
+
+    @{
+        ViewData["Title"] = "AddBook";
+    }
+
+    <script>
+        window.onload = function () {
+            $("input").addClass("form-control");
+        }
+        window.onbeforeunload = function () {
+            return "您的数据未保存，确定退出？";
+        }
+        function removeOnbeforeunload() {
+            window.onbeforeunload = "";
+        }
+    </script>
+
+    <h2>@($"为《{Model.Name}》添加借阅/阅览书籍信息")</h2>
+    <br />
+    <br />
+    @if (TempData["message"] != null)
+    {
+        <p class="text-success">@TempData["message"]</p>
+        <br />
+        <br />
+    }
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    <form asp-action="AddBook" method="post">
+        <div class="form-group">
+            @Html.LabelFor(b => b.ISBN)
+            <input type="text" value="@Model.ISBN" readonly="readonly" name="@nameof(Model.ISBN)" />
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(b => b.Name)
+            <input type="text" value="@Model.Name" readonly="readonly" name="@nameof(Model.Name)" />
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(b => b.FetchBookNumber)
+            <input type="text" value="@Model.FetchBookNumber" readonly="readonly" name="@nameof(Model.FetchBookNumber)" />
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(b => Model.BarCode)
+            @Html.EditorFor(b => Model.BarCode)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(b => Model.BookshelfId)
+            @Html.EditorFor(b => Model.BookshelfId)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(b => Model.State)
+            @Html.DropDownListFor(b=>Model.State,Enum.GetValues(typeof(BookState)).Cast<Enum>().Select(state =>
+       {
+           string enumVal = Enum.GetName(typeof(BookState), state);
+           string displayVal;
+           switch (enumVal)
+           {
+               case "Normal":
+                   displayVal = "可借阅";
+                   break;
+               case "Readonly":
+                   displayVal = "馆内阅览";
+                   break;
+               case "Borrowed":
+                   displayVal = "已借出";
+                   break;
+               case "ReBorrowed":
+                   displayVal = "被续借";
+                   break;
+               case "Appointed":
+                   displayVal = "被预约";
+                   break;
+               default:
+                   displayVal = "";
+                   break;
+           }
+           return new SelectListItem()
+           {
+               Text=displayVal,
+               Value = enumVal
+           };
+       }))
+        </div>
+        <div class="form-group"></div>
+        <input type="submit" class="btn-success" onclick="removeOnbeforeunload()" />
+    </form>

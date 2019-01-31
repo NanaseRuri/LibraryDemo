@@ -26,7 +26,7 @@ namespace LibraryDemo.Migrations
 
                     b.Property<DateTime?>("AppointedLatestTime");
 
-                    b.Property<int?>("BookshelfId");
+                    b.Property<int>("BookshelfId");
 
                     b.Property<DateTime?>("BorrowTime");
 
@@ -190,7 +190,8 @@ namespace LibraryDemo.Migrations
                 {
                     b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
                         .WithMany("Books")
-                        .HasForeignKey("BookshelfId");
+                        .HasForeignKey("BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("LibraryDemo.Models.DomainModels.Student", "Keeper")
                         .WithMany("KeepingBooks")
