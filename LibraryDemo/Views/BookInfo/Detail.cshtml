@@ -1,0 +1,103 @@
+﻿@using LibraryDemo.Models.DomainModels
+@model BookEditModel
+@{
+    ViewData["Title"] = @Model.BookDetails.Name;
+    Book tempBook = new Book();
+    Layout = "_LendingLayout";
+}
+<link rel="stylesheet" href="~/css/BookInfo.css" />
+
+<script>
+    function confirmBooing() {
+        if (confirm("确认预约该图书?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
+<hr />
+
+
+<div style="float: left">
+    <table>
+        <tbody>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.Name)</th>
+                <td>@Html.DisplayFor(model => model.BookDetails.Name)</td>
+            </tr>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.FetchBookNumber)</th>
+                <td>@Html.DisplayFor(model => model.BookDetails.FetchBookNumber)</td>
+            </tr>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.Author)</th>
+                <td>@Html.DisplayFor(model => model.BookDetails.Author)</td>
+            </tr>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.Press)</th>
+                <td>@Html.DisplayFor(model => model.BookDetails.Press)</td>
+            </tr>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.PublishDateTime)</th>
+                <td>@Model.BookDetails.PublishDateTime.ToString("yyyy/M/dd")</td>
+            </tr>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.SoundCassettes)</th>
+                <td>@Html.DisplayFor(model => model.BookDetails.SoundCassettes)</td>
+            </tr>
+            <tr class="bookDetails">
+                <th>@Html.LabelFor(model => model.BookDetails.Version)</th>
+                <td>@Html.DisplayFor(model => model.BookDetails.Version)</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <table>
+        <tr>
+            <th>@Html.LabelFor(m => tempBook.Location)</th>
+            <th>@Html.LabelFor(m => tempBook.FetchBookNumber)</th>
+            <th>@Html.LabelFor(m => tempBook.BarCode)</th>
+            <th>@Html.LabelFor(m => tempBook.State)</th>
+        </tr>
+        @if (!Model.Books.Any())
+        {
+            <tr><td colspan="4" style="text-align: center">暂未有外借/阅览书籍信息</td></tr>
+        }
+        else
+        {
+            foreach (var book in Model.Books)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(b => book.Location)</td>
+                    <td>@Html.DisplayFor(b => book.FetchBookNumber)</td>
+                    <td><a asp-action="Booking" asp-route-barcode="@book.BarCode" asp-route-isbn="@book.ISBN" onclick="return confirmBooing()">@Html.DisplayFor(b => book.BarCode)</a></td>
+                    <td>
+                        @Html.DisplayFor(b => book.State)
+                    @switch (book.State)
+                    {
+                        case BookState.Appointed:@book.AppointedLatestTime.Value.ToString("yyyy/M/d")
+                        ;
+                        break;
+                    case BookState.Borrowed:@(book.BorrowTime
+                                  + TimeSpan.FromDays(28));
+                    break;
+                case BookState.ReBorrowed:@(book.BorrowTime + TimeSpan.FromDays(28));
+                break;
+        }
+                </td>
+            </tr>
+        }
+    }
+    </table>
+</div>
+<div style="float:left">
+    @if (Model.BookDetails.ImageData == null)
+    {
+        <label>No Image</label>
+    }
+    else
+    {
+        <img class="img-thumbnail pull-left" src="@Url.Action("GetImage", "BookInfo", new {Model.BookDetails.ISBN})" />
+    }
+</div>

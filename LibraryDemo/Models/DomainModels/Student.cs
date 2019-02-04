@@ -35,7 +35,7 @@ namespace LibraryDemo.Models.DomainModels
         /// <summary>
         /// 已借图书
         /// </summary>
-        public IEnumerable<Book> KeepingBooks { get; set; }
+        public ICollection<Book> KeepingBooks { get; set; }
 
         /// <summary>
         /// 预约的书

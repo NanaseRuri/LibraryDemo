@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using LibraryDemo.Models.DomainModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 
 namespace LibraryDemo.Models.DomainModels
@@ -74,7 +75,7 @@ namespace LibraryDemo.Models.DomainModels
         /// </summary>
         public Student Keeper { get; set; }
         [Display(Name = "持有者学号")]
-        public string KeeperId { get; set; }
+        public string KeeperId{ get; set; }
 
         [Display(Name = "位置")]
         public string Location { get; set; }

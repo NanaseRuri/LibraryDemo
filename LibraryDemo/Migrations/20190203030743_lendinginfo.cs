@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LibraryDemo.Migrations
 {
-    public partial class addRange : Migration
+    public partial class lendinginfo : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -96,7 +96,7 @@ namespace LibraryDemo.Migrations
                 {
                     BarCode = table.Column<string>(nullable: false),
                     ISBN = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
                     FetchBookNumber = table.Column<string>(nullable: true),
                     BookshelfId = table.Column<int>(nullable: false),
                     BorrowTime = table.Column<DateTime>(nullable: true),
@@ -104,6 +104,7 @@ namespace LibraryDemo.Migrations
                     AppointedLatestTime = table.Column<DateTime>(nullable: true),
                     State = table.Column<int>(nullable: false),
                     KeeperId = table.Column<string>(nullable: true),
+                    KeeperUserName = table.Column<string>(nullable: true),
                     Location = table.Column<string>(nullable: true),
                     Sort = table.Column<string>(nullable: true)
                 },

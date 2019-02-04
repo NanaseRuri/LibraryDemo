@@ -17,5 +17,6 @@ namespace LibraryDemo.Data
         public DbSet<BookDetails> BooksDetail { get; set; }
         public DbSet<Bookshelf> Bookshelves { get; set; }
         public DbSet<RecommendedBook> RecommendedBooks { get; set; }
+        public DbSet<Student> Students { get; set; }
     }
 }

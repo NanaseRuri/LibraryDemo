@@ -1,0 +1,60 @@
+﻿@model LibraryDemo.Models.PersonalInfoViewModel
+@{
+    ViewData["Title"] = "PersonalInfo";
+    Layout = "_LendingLayout";
+    double fine = 0;
+}
+<link rel="stylesheet" href="~/css/BookInfo.css" />
+
+<h2>@Model.Student.Name</h2>
+<br />
+@if (Model.Student.KeepingBooks.Any(b => b.MatureTime < DateTime.Now))
+{
+    <p>
+        罚款:@foreach (var matureBook in Model.Student.KeepingBooks.Where(b => b.MatureTime < DateTime.Now))
+        {
+            fine += (DateTime.Now - matureBook.MatureTime).Value.TotalDays * 0.2;
+        }
+        @fine
+    </p>
+}
+<form asp-action="ReBorrow" method="post">
+    <table>
+        <tr>
+            <th>续借</th>
+            <th>书名</th>
+            <th>条形码</th>
+            <th>状态</th>
+            <th>到期时间</th>
+            <th>索书号</th>
+        </tr>
+        @if (!Model.Student.KeepingBooks.Any())
+        {
+            <tr>
+                <td colspan="6" style="text-align: center">未借阅书本</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var keepingBook in Model.Student.KeepingBooks)
+            {                
+                
+            }
+        }
+    </table>    
+</form>
+
+<br />
+@if (Model.BookingBook != null)
+{
+<table>
+    <tr>
+        <th>书名</th>
+        <th>条形码</th>
+        <th>状态</th>
+        <th>预约时间</th>
+        <th>索书号</th>
+    </tr>
+    <book-info book="@Model.BookingBook" is-booking-book="true"></book-info>
+</table>
+}

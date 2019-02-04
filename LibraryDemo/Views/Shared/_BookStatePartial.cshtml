@@ -1,43 +1,7 @@
 ﻿@using LibraryDemo.Models.DomainModels
-@model LibraryDemo.Models.DomainModels.Book
-
-@{
-    ViewData["Title"] = "EditBook";
-}
-
-<script>
-    window.onload = function () {
-        $("input").addClass("form-control");
-    }
-    window.onbeforeunload = function (event) {
-        return "您的数据未保存，确定退出？";
-    }
-    function removeOnbeforeunload() {
-        window.onbeforeunload = "";
-    }
-</script>
-
-<h2>编辑外借书籍</h2>
-<br />
-<h3>《@Model.Name》</h3>
-<br />
-<h4>原二维码：@Model.BarCode</h4>
-<br />
-@Html.ValidationSummary(false,"",new{@class="text-danger"})
-
-<form asp-action="EditBook" method="post">
-    <input type="hidden" name="oldBarCode" value="@Model.BarCode" />
-    <input type="hidden" name="Name" value="@Model.Name" />
+@model Book
     <div class="form-group">
-        @Html.LabelFor(b => b.BarCode)
-        @Html.EditorFor(b => b.BarCode)
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(b => b.BookshelfId)
-        @Html.EditorFor(b => b.BookshelfId)
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(b => b.State)
+    @Html.LabelFor(b => b.State)
         @Html.DropDownListFor(b => b.State, Enum.GetValues(typeof(BookState)).Cast<Enum>().Select(state =>
         {
             string enumVal = Enum.GetName(typeof(BookState), state);
@@ -71,6 +35,3 @@
             };
         }))
     </div>
-    <div class="form-group"></div>
-    <input type="submit" class="btn-success" onclick="removeOnbeforeunload()" />
-</form>

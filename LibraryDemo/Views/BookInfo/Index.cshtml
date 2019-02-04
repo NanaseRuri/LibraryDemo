@@ -1,8 +1,9 @@
-﻿@using LibraryDemo.TagHelpers
+﻿@using LibraryDemo.HtmlHelpers
 @model BookListViewModel
 @{
     ViewData["Title"] = "Index";
     int i = 1;
+    Layout = "_LendingLayout";
 }
 <style type="text/css">
     tr > td {
@@ -33,7 +34,7 @@
                 }   
             </td>
             <td style="text-align: left;">
-                <a style="margin-left: 1em;">@book.Name</a>
+                <a style="margin-left: 1em;" href="@Url.Action("Detail",new{isbn=@book.ISBN})">@book.Name</a>
                 <div style="margin-left: 2em;margin-top: 5px">
                     <span>@book.Author</span>
                     <br />

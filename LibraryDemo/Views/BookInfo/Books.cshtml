@@ -31,7 +31,7 @@
         }
 
         td + td {
-            padding-left: 100px;
+            padding-left: 50px;
         }
 
         .container {
@@ -67,6 +67,7 @@
                 <td>@Html.LabelFor(b => temp.AppointedLatestTime)</td>
                 <td>@Html.LabelFor(b => temp.State)</td>
                 <td>@Html.LabelFor(b => temp.Keeper)</td>
+                <td>编辑借出信息</td>
             </tr>
                 @if (Model.Books.ToList().Count == 0)
                 {
@@ -83,6 +84,7 @@
                         <td>@Html.DisplayFor(b => book.AppointedLatestTime)</td>
                         <td>@Html.DisplayFor(b => book.State)</td>
                         <td>@Html.DisplayFor(b => book.Keeper.Name)</td>
+                        <td><a asp-action="EditLendingInfo" asp-route-barcode="@book.BarCode">编辑</a></td>
                     </tr>
                 }
             </tbody>

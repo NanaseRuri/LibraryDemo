@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryDemo.Migrations
 {
     [DbContext(typeof(LendingInfoDbContext))]
-    [Migration("20190129092401_addRange")]
-    partial class addRange
+    [Migration("20190203034106_lendinginfo3")]
+    partial class lendinginfo3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,8 +42,7 @@ namespace LibraryDemo.Migrations
 
                     b.Property<DateTime?>("MatureTime");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
                     b.Property<string>("Sort");
 

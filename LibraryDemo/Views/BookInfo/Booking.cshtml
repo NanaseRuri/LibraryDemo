@@ -1,0 +1,18 @@
+﻿@model LibraryDemo.Models.DomainModels.Book
+
+@{
+    ViewData["Title"] = "Booking";
+    Layout = "_LendingLayout";
+}
+
+<h2>@Model.Name</h2>
+<br/>
+@Html.ValidationSummary(false, "", new { @class="text-danger"})
+<form method="post">
+    <input type="hidden" value="@Model.BarCode" name="barcode"/>
+    <div class="form-group">
+        <div>取书时间</div>
+        <input type="date" name="dateTime" class="form-control"/>
+    </div>
+    <input type="submit"/>
+</form>

@@ -1,0 +1,42 @@
+﻿@using LibraryDemo.Models.DomainModels
+@model LibraryDemo.Models.DomainModels.Book
+@{
+    ViewData["Title"] = "EditLendingInfo";
+}
+
+<h2>@Model.BarCode</h2>
+<h3>@Model.Name</h3>
+<br/>
+
+<script>
+    window.onload = function() {
+        $("input").addClass("form-control");
+    }
+    window.onbeforeunload = function (event) {
+        return "您的数据未保存，确定退出？";
+    }
+    function removeOnbeforeunload() {
+        window.onbeforeunload = "";
+    }
+</script>
+
+@Html.ValidationSummary(false,"",new{@class="text-danger"})
+
+<form asp-action="EditLendingInfo" method="post">
+    @Html.HiddenFor(b => b.BarCode)
+    @Html.HiddenFor(b => b.ISBN)
+    <div class="form-group">
+        @Html.LabelFor(b => b.KeeperId)
+        @Html.EditorFor(b => b.KeeperId)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(b => b.BorrowTime)
+        @Html.EditorFor(b => b.BorrowTime)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(b => b.AppointedLatestTime)
+        @Html.EditorFor(b => b.AppointedLatestTime)
+    </div>
+    <partial model="@Model" name="_BookStatePartial"/>
+    <input type="submit" onclick="return removeOnbeforeunload()" class="btn-primary"/>
+</form>

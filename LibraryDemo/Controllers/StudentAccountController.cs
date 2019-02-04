@@ -65,10 +65,15 @@ namespace LibraryDemo.Controllers
             return View(loginInfo);
         }
 
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string returnUrl)
         {
             await _signInManager.SignOutAsync();
-            return View("Login");
+            if (returnUrl == null)
+            {
+                return View("Login");
+            }
+
+            return Redirect(returnUrl);
         }
 
         public IActionResult ModifyPassword()

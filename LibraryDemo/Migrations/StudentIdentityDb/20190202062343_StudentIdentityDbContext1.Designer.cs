@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryDemo.Migrations.StudentIdentityDb
 {
     [DbContext(typeof(StudentIdentityDbContext))]
-    [Migration("20181215082735_StudentIdentity")]
-    partial class StudentIdentity
+    [Migration("20190202062343_StudentIdentityDbContext1")]
+    partial class StudentIdentityDbContext1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,6 +28,8 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
 
                     b.Property<DateTime?>("AppointedLatestTime");
 
+                    b.Property<int>("BookshelfId");
+
                     b.Property<DateTime?>("BorrowTime");
 
                     b.Property<string>("FetchBookNumber");
@@ -36,44 +38,28 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
 
                     b.Property<string>("KeeperId");
 
+                    b.Property<string>("Location");
+
                     b.Property<DateTime?>("MatureTime");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Sort");
 
                     b.Property<int>("State");
 
                     b.HasKey("BarCode");
+
+                    b.HasIndex("BookshelfId");
 
                     b.HasIndex("KeeperId");
 
                     b.ToTable("Book");
                 });
 
-            modelBuilder.Entity("LibraryDemo.Models.DomainModels.BookMiddle", b =>
-                {
-                    b.Property<int>("BookMiddleId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("BookId");
-
-                    b.Property<int>("BookshelfId");
-
-                    b.HasKey("BookMiddleId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("BookshelfId");
-
-                    b.ToTable("BookMiddle");
-                });
-
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.Bookshelf", b =>
                 {
-                    b.Property<int>("BookshelfId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("BookshelfId");
 
                     b.Property<string>("Location")
                         .IsRequired();
@@ -267,21 +253,14 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
 
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.Book", b =>
                 {
+                    b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
+                        .WithMany("Books")
+                        .HasForeignKey("BookshelfId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("LibraryDemo.Models.DomainModels.Student", "Keeper")
                         .WithMany("KeepingBooks")
                         .HasForeignKey("KeeperId");
-                });
-
-            modelBuilder.Entity("LibraryDemo.Models.DomainModels.BookMiddle", b =>
-                {
-                    b.HasOne("LibraryDemo.Models.DomainModels.Book", "Book")
-                        .WithMany("BookMiddles")
-                        .HasForeignKey("BookId");
-
-                    b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
-                        .WithMany("BookMiddles")
-                        .HasForeignKey("BookshelfId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

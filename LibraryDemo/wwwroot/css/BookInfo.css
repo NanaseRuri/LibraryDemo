@@ -1,0 +1,26 @@
+﻿table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    width: 1000px
+}
+
+th {
+    background: #a0c0ff;
+    padding-right: 2px;
+    text-indent: 0.3em;
+}
+
+td {
+    background: #d7e3ff;
+    text-indent: 0.5em;
+}
+
+.bookDetails > th {
+    width: 10%;
+    text-align: right;
+    padding-right: 0.5em;
+}
+
+div + div {
+    margin-left: 10px;
+}
