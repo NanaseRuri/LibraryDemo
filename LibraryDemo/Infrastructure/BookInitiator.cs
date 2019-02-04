@@ -425,6 +425,59 @@ namespace LibraryDemo.Infrastructure
                     await context.SaveChangesAsync();
                 }
             }
+
+            if (!context.Students.Any())
+            {
+                IEnumerable<StudentInfo> initialStudents = new[]
+                {
+                    new StudentInfo()
+                    {
+                        UserName = "U201600001",
+                        Name = "Nanase",
+                        PhoneNumber = "12345678910",
+                        Degree = Degrees.CollegeStudent,
+                        MaxBooksNumber = 10,
+                    },
+                    new StudentInfo()
+                    {
+                        UserName = "U201600002",
+                        Name = "Ruri",
+                        PhoneNumber = "12345678911",
+                        Degree = Degrees.DoctorateDegree,
+                        MaxBooksNumber = 15
+                    }
+                };
+
+                IEnumerable<StudentInfo> initialAdmins = new[]
+                {
+                    new StudentInfo()
+                    {
+                        UserName = "A000000000",
+                        Name="Admin0000",
+                        PhoneNumber = "12345678912",
+                        Degree = Degrees.CollegeStudent,
+                        MaxBooksNumber = 20
+                    },
+                    new StudentInfo()
+                    {
+                        UserName = "A000000001",
+                        Name = "Admin0001",
+                        PhoneNumber = "15827411963",
+                        Degree = Degrees.CollegeStudent,
+                        MaxBooksNumber = 20
+                    },
+                };
+                foreach (var student in initialStudents)
+                {
+                    context.Students.Add(student);
+                    await context.SaveChangesAsync();
+                }
+                foreach (var admin in initialAdmins)
+                {
+                    context.Students.Add(admin);
+                    await context.SaveChangesAsync();
+                }
+            }
         }
     }
 }

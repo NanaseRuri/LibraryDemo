@@ -4,14 +4,16 @@ using LibraryDemo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LibraryDemo.Migrations
 {
     [DbContext(typeof(LendingInfoDbContext))]
-    partial class LendingInfoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190204074924_addStudents")]
+    partial class addStudents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,15 +48,11 @@ namespace LibraryDemo.Migrations
 
                     b.Property<int>("State");
 
-                    b.Property<string>("StudentInfoUserName");
-
                     b.HasKey("BarCode");
 
                     b.HasIndex("BookshelfId");
 
                     b.HasIndex("KeeperId");
-
-                    b.HasIndex("StudentInfoUserName");
 
                     b.ToTable("Books");
                 });
@@ -146,6 +144,8 @@ namespace LibraryDemo.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<string>("AppointingBookBarCode");
+
                     b.Property<string>("ConcurrencyStamp");
 
                     b.Property<int>("Degree");
@@ -154,13 +154,16 @@ namespace LibraryDemo.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<decimal>("Fine");
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
 
                     b.Property<int>("MaxBooksNumber");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("NormalizedEmail");
 
@@ -181,30 +184,6 @@ namespace LibraryDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Student");
-                });
-
-            modelBuilder.Entity("LibraryDemo.Models.DomainModels.StudentInfo", b =>
-                {
-                    b.Property<string>("UserName")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("AppointingBookBarCode");
-
-                    b.Property<int>("Degree");
-
-                    b.Property<decimal>("Fine");
-
-                    b.Property<int>("MaxBooksNumber");
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(14);
-
-                    b.HasKey("UserName");
-
                     b.ToTable("Students");
                 });
 
@@ -216,12 +195,8 @@ namespace LibraryDemo.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("LibraryDemo.Models.DomainModels.Student", "Keeper")
-                        .WithMany()
-                        .HasForeignKey("KeeperId");
-
-                    b.HasOne("LibraryDemo.Models.DomainModels.StudentInfo")
                         .WithMany("KeepingBooks")
-                        .HasForeignKey("StudentInfoUserName");
+                        .HasForeignKey("KeeperId");
                 });
 #pragma warning restore 612, 618
         }

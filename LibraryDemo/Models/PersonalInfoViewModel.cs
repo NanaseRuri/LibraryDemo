@@ -8,7 +8,7 @@ namespace LibraryDemo.Models
 {
     public class PersonalInfoViewModel
     {
-        public Student Student { get; set; }
+        public StudentInfo Student { get; set; }
         public Book BookingBook { get; set; }
     }
 }
