@@ -73,7 +73,7 @@ namespace LibraryDemo.Models.DomainModels
         /// <summary>
         /// 持有者，指定外键
         /// </summary>
-        public Student Keeper { get; set; }
+        public StudentInfo Keeper { get; set; }
         [Display(Name = "持有者学号")]
         public string KeeperId{ get; set; }
 

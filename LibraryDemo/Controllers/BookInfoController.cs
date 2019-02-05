@@ -21,7 +21,7 @@ namespace LibraryDemo.Controllers
 {
     public class BookInfoController : Controller
     {
-        private LendingInfoDbContext _lendingInfoDbContext;        
+        private LendingInfoDbContext _lendingInfoDbContext;
         private static int amout = 4;
 
         public BookInfoController(LendingInfoDbContext context)
@@ -152,7 +152,7 @@ namespace LibraryDemo.Controllers
         [Authorize]
         public async Task<IActionResult> PersonalInfo()
         {
-            StudentInfo student = await _lendingInfoDbContext.Students.Include(s=>s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
+            StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
             PersonalInfoViewModel model = new PersonalInfoViewModel()
             {
                 Student = student,
@@ -349,7 +349,7 @@ namespace LibraryDemo.Controllers
         {
             BookEditModel model = new BookEditModel()
             {
-                Books = _lendingInfoDbContext.Books.AsNoTracking().Where(b => b.ISBN == isbn),
+                Books = _lendingInfoDbContext.Books.Include(b=>b.Keeper).AsNoTracking().Where(b => b.ISBN == isbn),
                 BookDetails = _lendingInfoDbContext.BooksDetail.AsNoTracking().FirstOrDefault(b => b.ISBN == isbn)
             };
             if (model.BookDetails == null)
@@ -431,7 +431,11 @@ namespace LibraryDemo.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult EditBook(string barcode)
         {
-            Book book = _lendingInfoDbContext.Books.First(b => b.BarCode == barcode);
+            Book book = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
+            if (book == null)
+            {
+                return RedirectToAction("BookDetails");
+            }
             return View(book);
         }
 
@@ -496,41 +500,72 @@ namespace LibraryDemo.Controllers
                     ModelState.AddModelError("", "请检查外借时间");
                     return View(book);
                 }
-                if (book.AppointedLatestTime.HasValue && book.AppointedLatestTime < DateTime.Now)
+                if (book.AppointedLatestTime.HasValue)
                 {
-                    ModelState.AddModelError("", "请检查预约时间");
-                    return View(book);
-                }
-                StudentInfo student = await _lendingInfoDbContext.Students.Include(s=>s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
-                Book addedBook = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == book.BarCode);
-                if (addedBook == null)
-                {
-                    ModelState.AddModelError("","不存在图书带有该二维码");
-                    return View(book);
-                }
-                addedBook.BorrowTime = book.BorrowTime;
-                if (addedBook.BorrowTime.HasValue)
-                {
-                    addedBook.MatureTime = addedBook.BorrowTime + TimeSpan.FromDays(28);
-                }
-                addedBook.AppointedLatestTime = book.AppointedLatestTime;
-                addedBook.State = book.State;                
-                if (student != null)
-                {
-                    if (!student.KeepingBooks.Contains(addedBook))
+                    if (book.AppointedLatestTime < DateTime.Now)
                     {
-                        if (student.KeepingBooks.Count > student.MaxBooksNumber)
-                        {
-                            TempData["message"] = "该学生借书已超过上限";
-                        }
-                        student.KeepingBooks.Add(addedBook);
+                        ModelState.AddModelError("", "请检查预约时间");
+                        return View(book);
+                    }
+
+                    if (book.KeeperId == null)
+                    {
+                        ModelState.AddModelError("", "不存在该学生");
+                        return View(book);
                     }
                 }
+
+                StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == book.KeeperId);                
+
+                Book addedBook = _lendingInfoDbContext.Books
+                    .Include(b=>b.Keeper).ThenInclude(s=>s.KeepingBooks)
+                    .FirstOrDefault(b => b.BarCode == book.BarCode);
+                if (addedBook == null)
+                {
+                    return RedirectToAction("Books", new { isbn = book.ISBN });
+                }
+
+                addedBook.AppointedLatestTime = book.AppointedLatestTime;
+                addedBook.State = book.State;
+                addedBook.BorrowTime = book.BorrowTime;
+                addedBook.MatureTime = null;
+                addedBook.Keeper?.KeepingBooks.Remove(addedBook);
+
+                if (addedBook.BorrowTime.HasValue)
+                {
+                    if (book.KeeperId == null)
+                    {
+                        ModelState.AddModelError("", "请检查借阅者");
+                        return View(book);
+                    }
+
+                    if (student == null)
+                    {
+                        ModelState.AddModelError("", "不存在该学生");
+                        return View(book);
+                    }
+                    if (student != null)
+                    {                        
+                        if (!student.KeepingBooks.Contains(addedBook))
+                        {
+                            if (student.KeepingBooks.Count >= student.MaxBooksNumber)
+                            {
+                                TempData["message"] = "该学生借书已超过上限";
+                            }
+
+                            student.KeepingBooks.Add(addedBook);
+                        }
+                    }
+                    addedBook.MatureTime = addedBook.BorrowTime + TimeSpan.FromDays(28);
+                }
+
+
+                TempData["message"] = "保存成功";
                 await _lendingInfoDbContext.SaveChangesAsync();
-                TempData["message"] = "编辑成功";
-                return RedirectToAction("Books", new {isbn = book.ISBN});
+                return RedirectToAction("Books", new { isbn = book.ISBN });
             }
             return View(book);
+
         }
 
 
