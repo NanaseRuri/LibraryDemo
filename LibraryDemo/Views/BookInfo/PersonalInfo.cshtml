@@ -38,10 +38,19 @@
         {
             foreach (var keepingBook in Model.Student.KeepingBooks)
             {                
-                
+                <tr>
+                    <td><input type="checkbox" value="@keepingBook.BarCode" name="barcodes"/></td>
+                    <td>@keepingBook.Name</td>
+                    <td>@keepingBook.BarCode</td>
+                    <td>@Html.DisplayFor(b=>keepingBook.State)</td>
+                    <td>@keepingBook.MatureTime?.ToString("yyyy/MM/dd")</td>
+                    <td>@keepingBook.FetchBookNumber</td>
+                </tr>
             }
         }
     </table>    
+    <br/>
+    <input type="submit" class="btn-primary btn" value="续借"/>
 </form>
 
 <br />

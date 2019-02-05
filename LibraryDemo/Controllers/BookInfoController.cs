@@ -128,9 +128,11 @@ namespace LibraryDemo.Controllers
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> ReBorrow(IEnumerable<string> barcodes)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("已续借书籍");
+        {            
+            StringBuilder borrowSuccess = new StringBuilder();
+            StringBuilder borrowFail=new StringBuilder();
+            borrowSuccess.Append("成功续借书籍:");
+            borrowFail.Append("续借失败书籍：");
             foreach (var barcode in barcodes)
             {
                 Book reBorrowBook = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
@@ -140,12 +142,17 @@ namespace LibraryDemo.Controllers
                     {
                         reBorrowBook.State = BookState.ReBorrowed;
                         reBorrowBook.BorrowTime = DateTime.Now.Date;
-                        sb.Append($"《{reBorrowBook.Name}》、");
+                        borrowSuccess.Append($"《{reBorrowBook.Name}》、");
+                    }
+                    else
+                    {
+                        borrowFail.Append($"《{reBorrowBook.Name}》、");
                     }
                 }
             }
+            borrowSuccess.AppendLine(borrowFail.ToString());
             await _lendingInfoDbContext.SaveChangesAsync();
-            TempData["message"] = sb.ToString();
+            TempData["message"] = borrowSuccess.ToString();
             return RedirectToAction("PersonalInfo");
         }
 
@@ -553,6 +560,7 @@ namespace LibraryDemo.Controllers
                                 TempData["message"] = "该学生借书已超过上限";
                             }
 
+                            book.State = BookState.Borrowed;
                             student.KeepingBooks.Add(addedBook);
                         }
                     }
@@ -565,7 +573,6 @@ namespace LibraryDemo.Controllers
                 return RedirectToAction("Books", new { isbn = book.ISBN });
             }
             return View(book);
-
         }
 
 
