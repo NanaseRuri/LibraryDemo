@@ -29,11 +29,8 @@ namespace LibraryDemo.Models.DomainModels
         /// <summary>
         /// 已借图书
         /// </summary>
-        public ICollection<Book> KeepingBooks { get; set; }
+        public ICollection<AppointmentOrLending> KeepingBooks { get; set; }
 
-        /// <summary>
-        /// 预约的书
-        /// </summary>
         public string AppointingBookBarCode { get; set; }
 
         [StringLength(14, MinimumLength = 11)]
@@ -42,6 +39,6 @@ namespace LibraryDemo.Models.DomainModels
         /// <summary>
         /// 罚款
         /// </summary>
-        public decimal Fine { get; set; }        
+        public decimal Fine { get; set; }               
     }
 }

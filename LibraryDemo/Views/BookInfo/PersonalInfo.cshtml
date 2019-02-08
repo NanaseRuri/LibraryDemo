@@ -2,21 +2,47 @@
 @{
     ViewData["Title"] = "PersonalInfo";
     Layout = "_LendingLayout";
-    double fine = 0;
 }
 <link rel="stylesheet" href="~/css/BookInfo.css" />
+<script>
+    function ensureCancel() {
+        if (confirm("确定取消预约？")) {
+            return true;
+        }
+        return false;
+    }
+</script>
 
 <h2>@Model.Student.Name</h2>
 <br />
-@if (Model.Student.KeepingBooks.Any(b => b.MatureTime < DateTime.Now))
-{
-    <p>
-        罚款:@foreach (var matureBook in Model.Student.KeepingBooks.Where(b => b.MatureTime < DateTime.Now))
-        {
-            fine += (DateTime.Now - matureBook.MatureTime).Value.TotalDays * 0.2;
-        }
-        @fine
-    </p>
+@if (Model.Student.KeepingBooks.Any(b => b.Book.MatureTime < DateTime.Now))
+{    
+<table>
+    <thead>
+        <tr>
+            <th colspan="5">过期书籍</th>
+        </tr>
+    </thead>
+    <tr>
+        <th>书名</th>
+        <th>条形码</th>
+        <th>状态</th>
+        <th>到期时间</th>
+        <th>索书号</th>
+    </tr>
+
+    @foreach (var matureBook in Model.Student.KeepingBooks.Where(b => b.Book.MatureTime < DateTime.Now && !b.AppointingDateTime.HasValue))
+    {
+        <tr>
+            <td>@matureBook.Book.Name</td>
+            <td>@matureBook.Book.BarCode</td>
+            <td>@Html.DisplayFor(b => matureBook.Book.State)</td>
+            <td>@matureBook.Book.MatureTime?.ToString("yyyy/MM/dd")</td>
+            <td>@matureBook.Book.FetchBookNumber</td>
+        </tr>
+    }
+    <tfoot><tr><td colspan="5">罚款:@Model.Student.Fine</td></tr></tfoot>
+</table>    
 }
 <form asp-action="ReBorrow" method="post">
     <table>
@@ -36,15 +62,15 @@
         }
         else
         {
-            foreach (var keepingBook in Model.Student.KeepingBooks)
+            foreach (var keepingBook in Model.Student.KeepingBooks.Where(b=>!b.AppointingDateTime.HasValue))
             {                
                 <tr>
-                    <td><input type="checkbox" value="@keepingBook.BarCode" name="barcodes"/></td>
-                    <td>@keepingBook.Name</td>
-                    <td>@keepingBook.BarCode</td>
-                    <td>@Html.DisplayFor(b=>keepingBook.State)</td>
-                    <td>@keepingBook.MatureTime?.ToString("yyyy/MM/dd")</td>
-                    <td>@keepingBook.FetchBookNumber</td>
+                    <td><input type="checkbox" value="@keepingBook.Book.BarCode" name="barcodes"/></td>
+                    <td>@keepingBook.Book.Name</td>
+                    <td>@keepingBook.Book.BarCode</td>
+                    <td>@Html.DisplayFor(b=>keepingBook.Book.State)</td>
+                    <td>@keepingBook.Book.MatureTime?.ToString("yyyy/MM/dd")</td>
+                    <td>@keepingBook.Book.FetchBookNumber</td>
                 </tr>
             }
         }
@@ -56,14 +82,19 @@
 <br />
 @if (Model.BookingBook != null)
 {
-<table>
-    <tr>
-        <th>书名</th>
-        <th>条形码</th>
-        <th>状态</th>
-        <th>预约时间</th>
-        <th>索书号</th>
-    </tr>
-    <book-info book="@Model.BookingBook" is-booking-book="true"></book-info>
-</table>
+    <form asp-action="CancelAppointing">        
+        <table>
+            <tr>
+                <th>书名</th>
+                <th>条形码</th>
+                <th>状态</th>
+                <th>预约时间</th>
+                <th>索书号</th>
+            </tr>
+            <book-info book="@Model.BookingBook" is-booking-book="true"></book-info>
+        </table>
+        <br />
+        <input type="hidden" name="barcode" value="@Model.BookingBook.BarCode"/>
+        <input type="submit" value="取消预约" class="btn btn-danger" onclick="return ensureCancel()"/>
+    </form>
 }

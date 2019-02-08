@@ -82,5 +82,7 @@ namespace LibraryDemo.Models.DomainModels
 
         [Display(Name = "分类")]
         public string Sort { get; set; }
+
+        public ICollection<AppointmentOrLending> Appointments { get; set; }
     }
 }

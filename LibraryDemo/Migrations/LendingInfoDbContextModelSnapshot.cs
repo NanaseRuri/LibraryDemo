@@ -19,6 +19,21 @@ namespace LibraryDemo.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("LibraryDemo.Models.DomainModels.AppointmentOrLending", b =>
+                {
+                    b.Property<string>("BookId");
+
+                    b.Property<string>("StudentId");
+
+                    b.Property<DateTime?>("AppointingDateTime");
+
+                    b.HasKey("BookId", "StudentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("AppointmentOrLendings");
+                });
+
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.Book", b =>
                 {
                     b.Property<string>("BarCode")
@@ -46,15 +61,11 @@ namespace LibraryDemo.Migrations
 
                     b.Property<int>("State");
 
-                    b.Property<string>("StudentInfoUserName");
-
                     b.HasKey("BarCode");
 
                     b.HasIndex("BookshelfId");
 
                     b.HasIndex("KeeperId");
-
-                    b.HasIndex("StudentInfoUserName");
 
                     b.ToTable("Books");
                 });
@@ -139,51 +150,6 @@ namespace LibraryDemo.Migrations
                     b.ToTable("RecommendedBooks");
                 });
 
-            modelBuilder.Entity("LibraryDemo.Models.DomainModels.Student", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AccessFailedCount");
-
-                    b.Property<string>("ConcurrencyStamp");
-
-                    b.Property<int>("Degree");
-
-                    b.Property<string>("Email");
-
-                    b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<int>("MaxBooksNumber");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("NormalizedEmail");
-
-                    b.Property<string>("NormalizedUserName");
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(14);
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Student");
-                });
-
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.StudentInfo", b =>
                 {
                     b.Property<string>("UserName")
@@ -208,6 +174,19 @@ namespace LibraryDemo.Migrations
                     b.ToTable("Students");
                 });
 
+            modelBuilder.Entity("LibraryDemo.Models.DomainModels.AppointmentOrLending", b =>
+                {
+                    b.HasOne("LibraryDemo.Models.DomainModels.Book", "Book")
+                        .WithMany("Appointments")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("LibraryDemo.Models.DomainModels.StudentInfo", "Student")
+                        .WithMany("KeepingBooks")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("LibraryDemo.Models.DomainModels.Book", b =>
                 {
                     b.HasOne("LibraryDemo.Models.DomainModels.Bookshelf", "Bookshelf")
@@ -215,13 +194,9 @@ namespace LibraryDemo.Migrations
                         .HasForeignKey("BookshelfId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("LibraryDemo.Models.DomainModels.Student", "Keeper")
+                    b.HasOne("LibraryDemo.Models.DomainModels.StudentInfo", "Keeper")
                         .WithMany()
                         .HasForeignKey("KeeperId");
-
-                    b.HasOne("LibraryDemo.Models.DomainModels.StudentInfo")
-                        .WithMany("KeepingBooks")
-                        .HasForeignKey("StudentInfoUserName");
                 });
 #pragma warning restore 612, 618
         }

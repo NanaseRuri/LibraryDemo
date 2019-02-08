@@ -71,27 +71,39 @@
                 <tr>
                     <td>@Html.DisplayFor(b => book.Location)</td>
                     <td>@Html.DisplayFor(b => book.FetchBookNumber)</td>
-                    <td><a asp-action="Booking" asp-route-barcode="@book.BarCode" asp-route-isbn="@book.ISBN" onclick="return confirmBooing()">@Html.DisplayFor(b => book.BarCode)</a></td>
+                    <td><a asp-action="Appointing" asp-route-barcode="@book.BarCode" asp-route-isbn="@book.ISBN" onclick="return confirmBooing()">@Html.DisplayFor(b => book.BarCode)</a></td>
                     <td>
-                        @Html.DisplayFor(b => book.State)
-                    @switch (book.State)
-                    {
-                        case BookState.Appointed:@book.AppointedLatestTime.Value.ToString("yyyy/M/d")
-                        ;
-                        break;
-                    case BookState.Borrowed:@(book.BorrowTime
-                                  + TimeSpan.FromDays(28));
-                    break;
-                case BookState.ReBorrowed:@(book.BorrowTime + TimeSpan.FromDays(28));
-                break;
+                        <span>
+                            @Html.DisplayFor(b => book.State).
+                            @switch (book.State)
+                            {
+                                case BookState.Borrowed:
+                                case BookState.ReBorrowed:
+                                    @:到期时间:
+                                    if (book.BorrowTime.HasValue)
+                                    {
+                                        @((book.BorrowTime.Value + TimeSpan.FromDays(28)).ToString("yyyy/M/d"))
+                                    }
+                                    ;
+                                    break;
+                            }</span>
+                        <span class="text-right">
+                            @if (book.Appointments.Any(a => a.AppointingDateTime.HasValue))
+                            {
+                                @:预约+ @book.Appointments.Where(a=>a.AppointingDateTime.HasValue).ToList().Count,
+                                if (book.AppointedLatestTime.HasValue)
+                                {
+                                    @(book.AppointedLatestTime.Value.ToString("yyyy/M/d"))
+                                }
+                            }
+                        </span>
+                    </td>
+                </tr>
+            }
         }
-                </td>
-            </tr>
-        }
-    }
     </table>
 </div>
-<div style="float:left">
+<div style="float: left; width: 120px; height: 180px;">
     @if (Model.BookDetails.ImageData == null)
     {
         <label>No Image</label>

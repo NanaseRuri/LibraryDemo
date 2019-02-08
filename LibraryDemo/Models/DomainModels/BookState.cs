@@ -36,6 +36,9 @@ namespace LibraryDemo.Models.DomainModels
         /// 被预约
         /// </summary>
         [Display(Name = "被预约")]
-        Appointed
+        Appointed,
+
+        [Display(Name = "过期")]
+        Expired
     }
 }

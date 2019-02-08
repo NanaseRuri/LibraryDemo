@@ -65,22 +65,37 @@ namespace LibraryDemo.Controllers
             BookEditModel model = new BookEditModel()
             {
                 BookDetails = bookDetails,
-                Books = _lendingInfoDbContext.Books.AsNoTracking().Where(b => b.ISBN == isbn)
+                Books = _lendingInfoDbContext.Books.Include(b => b.Appointments).AsNoTracking().Where(b => b.ISBN == isbn)
             };
             return View(model);
         }
 
         [Authorize]
-        public async Task<IActionResult> Booking(string barcode, string isbn)
+        public async Task<IActionResult> Appointing(string barcode, string isbn)
         {
+            Book bookingBook = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
+
+            if (bookingBook?.State == BookState.Readonly)
+            {
+                ModelState.AddModelError("", "该书不供外借");
+                return RedirectToAction("Detail", new { isbn = isbn });
+            }
+
             StudentInfo student =
-                await _lendingInfoDbContext.Students.FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
+                await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).ThenInclude(k => k.Book)
+                    .FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
             if (student.AppointingBookBarCode != null)
             {
                 TempData["message"] = "您已有预约书籍";
                 return RedirectToAction("Detail", new { isbn = isbn });
             }
-            Book bookingBook = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
+
+            if (student.KeepingBooks.Any(b => b.Book.BarCode == barcode))
+            {
+                TempData["message"] = "您已借阅该书籍";
+                return RedirectToAction("Detail", new { isbn = isbn });
+            }
+
             if (bookingBook == null)
             {
                 TempData["message"] = $"不存在书籍二维码为{barcode}";
@@ -94,14 +109,15 @@ namespace LibraryDemo.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Booking(string barcode, DateTime dateTime)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Appointing(string barcode, DateTime dateTime)
         {
-            Book lendingBook = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
+            Book lendingBook = _lendingInfoDbContext.Books.Include(b => b.Appointments).FirstOrDefault(b => b.BarCode == barcode);
             if (ModelState.IsValid)
             {
                 if (dateTime <= DateTime.Now)
                 {
-                    ModelState.AddModelError("", "你必须选择后面的日期");
+                    ModelState.AddModelError("", "你必须选择之后的日期");
                     return View(lendingBook);
                 }
                 if (lendingBook == null)
@@ -109,39 +125,66 @@ namespace LibraryDemo.Controllers
                     TempData["message"] = $"不存在二维码为{barcode}的书籍";
                     return RedirectToAction("Detail", new { isbn = lendingBook.ISBN });
                 }
-                StudentInfo student = await _lendingInfoDbContext.Students.FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
-                student.AppointingBookBarCode = barcode;
-                lendingBook.AppointedLatestTime = dateTime;
-                if (lendingBook.State != BookState.Readonly && lendingBook.State != BookState.Appointed)
+                StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
+                lendingBook.State = BookState.Appointed;
+                lendingBook.Appointments.Add(new AppointmentOrLending()
                 {
-                    lendingBook.State = BookState.Appointed;
-                    await _lendingInfoDbContext.SaveChangesAsync();
-                    TempData["message"] = "预约成功";
-                    return RedirectToAction("Detail", new { isbn = lendingBook.ISBN });
-                }
-                ModelState.AddModelError("", "该书不供外借");
+                    BookId = lendingBook.BarCode,
+                    StudentId = student.UserName,
+                    AppointingDateTime = dateTime
+                });
+                lendingBook.AppointedLatestTime = lendingBook.Appointments.Max(b => b.AppointingDateTime);
+                student.AppointingBookBarCode = lendingBook.BarCode;
+                await _lendingInfoDbContext.SaveChangesAsync();
+                TempData["message"] = "预约成功";
+                return RedirectToAction("Detail", new { isbn = lendingBook.ISBN });
             }
             return View(lendingBook);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> CancelAppointing(string barcode)
+        {
+            if (ModelState.IsValid)
+            {
+                StudentInfo student = _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).ThenInclude(k => k.Book).ThenInclude(b => b.Appointments)
+                    .FirstOrDefault(s => s.UserName == User.Identity.Name);
+                if (student.AppointingBookBarCode == barcode)
+                {
+                    student.AppointingBookBarCode = null;
+                    AppointmentOrLending targetAppointment = student.KeepingBooks.FirstOrDefault(a => a.BookId == barcode);
+                    student.KeepingBooks.Remove(targetAppointment);
+                    Book targetBook = targetAppointment.Book;
+
+                    targetBook.AppointedLatestTime = targetBook.Appointments.Any(a => a.AppointingDateTime.HasValue) ?
+                        targetBook.Appointments.Max(a => a.AppointingDateTime) : null;
+
+                    await _lendingInfoDbContext.SaveChangesAsync();
+                    TempData["message"] = "取消成功";
+                }
+            }
+            return RedirectToAction("PersonalInfo");
         }
 
 
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> ReBorrow(IEnumerable<string> barcodes)
-        {            
+        {
             StringBuilder borrowSuccess = new StringBuilder();
-            StringBuilder borrowFail=new StringBuilder();
+            StringBuilder borrowFail = new StringBuilder();
             borrowSuccess.Append("成功续借书籍:");
             borrowFail.Append("续借失败书籍：");
             foreach (var barcode in barcodes)
-            {
+            {   
                 Book reBorrowBook = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
                 if (reBorrowBook != null)
                 {
-                    if (reBorrowBook.State == BookState.Borrowed && reBorrowBook.KeeperId == User.Identity.Name)
+                    if (reBorrowBook.State == BookState.Borrowed && DateTime.Now-reBorrowBook.MatureTime?.Date<=TimeSpan.FromDays(3))
                     {
                         reBorrowBook.State = BookState.ReBorrowed;
                         reBorrowBook.BorrowTime = DateTime.Now.Date;
+                        reBorrowBook.MatureTime = DateTime.Now.Date+TimeSpan.FromDays(28);
                         borrowSuccess.Append($"《{reBorrowBook.Name}》、");
                     }
                     else
@@ -159,7 +202,16 @@ namespace LibraryDemo.Controllers
         [Authorize]
         public async Task<IActionResult> PersonalInfo()
         {
-            StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
+            StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).ThenInclude(k => k.Book)
+                .FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
+            decimal fine = 0;            
+            foreach (var book in student.KeepingBooks.Where(b => b.Book.MatureTime < DateTime.Now && !b.AppointingDateTime.HasValue))
+            {
+                fine += (DateTime.Now - book.Book.MatureTime.Value).Days * (decimal)0.2;
+                book.Book.State = book.Book.State == BookState.Appointed ? BookState.Appointed : BookState.Expired;
+            }
+
+            student.Fine = fine;
             PersonalInfoViewModel model = new PersonalInfoViewModel()
             {
                 Student = student,
@@ -343,7 +395,14 @@ namespace LibraryDemo.Controllers
 
             if (bookDetails != null)
             {
-                return RedirectToAction("EditBookDetails", new { isbn = bookDetails.ISBN });
+                if (User.Identity.IsAuthenticated&& User.IsInRole("Admin"))
+                {
+                    return RedirectToAction("EditBookDetails", new { isbn = bookDetails.ISBN });
+                }
+                else
+                {
+                    return RedirectToAction("Detail", new {isbn = bookDetails.ISBN});
+                }                
             }
 
             TempData["message"] = "找不到该书籍";
@@ -356,7 +415,7 @@ namespace LibraryDemo.Controllers
         {
             BookEditModel model = new BookEditModel()
             {
-                Books = _lendingInfoDbContext.Books.Include(b=>b.Keeper).AsNoTracking().Where(b => b.ISBN == isbn),
+                Books = _lendingInfoDbContext.Books.Include(b => b.Keeper).AsNoTracking().Where(b => b.ISBN == isbn),
                 BookDetails = _lendingInfoDbContext.BooksDetail.AsNoTracking().FirstOrDefault(b => b.ISBN == isbn)
             };
             if (model.BookDetails == null)
@@ -483,6 +542,43 @@ namespace LibraryDemo.Controllers
             return View(book);
         }
 
+        [Authorize]
+        public async Task<IActionResult> Lending(string barcode)
+        {
+            Book targetBook=await _lendingInfoDbContext.Books.Include(b=>b.Appointments).FirstOrDefaultAsync(b => b.BarCode == barcode);
+            if (targetBook==null)
+            {
+                TempData["message"] = "请重新扫描书籍";
+                return RedirectToAction("PersonalInfo");
+            }
+
+            if (targetBook.Appointments.Any(a=>a.AppointingDateTime.HasValue))
+            {
+                TempData["message"] = "此书已被预约";
+                return RedirectToAction("PersonalInfo");
+            }
+
+            if (targetBook.State==BookState.Readonly)
+            {
+                TempData["message"] = "此书不供外借";
+                return RedirectToAction("PersonalInfo");
+            }
+
+            targetBook.State = BookState.Borrowed;
+            targetBook.BorrowTime = DateTime.Now.Date;
+            targetBook.MatureTime = DateTime.Now.Date+TimeSpan.FromDays(28);
+            StudentInfo student =
+                await _lendingInfoDbContext.Students.Include(s=>s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == User.Identity.Name);
+            student.KeepingBooks.Add(new AppointmentOrLending()
+            {
+                BookId = targetBook.BarCode,
+                StudentId = student.UserName
+            });
+            await _lendingInfoDbContext.SaveChangesAsync();
+            TempData["message"] = "借书成功";
+            return RedirectToAction("PersonalInfo");
+        }
+
 
         [Authorize(Roles = "Admin")]
         public IActionResult EditLendingInfo(string barcode)
@@ -491,7 +587,7 @@ namespace LibraryDemo.Controllers
             {
                 return RedirectToAction("BookDetails");
             }
-            Book book = _lendingInfoDbContext.Books.First(b => b.BarCode == barcode);
+            Book book = _lendingInfoDbContext.Books.FirstOrDefault(b => b.BarCode == barcode);
             return View(book);
         }
 
@@ -522,21 +618,26 @@ namespace LibraryDemo.Controllers
                     }
                 }
 
-                StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == book.KeeperId);                
+                StudentInfo student = await _lendingInfoDbContext.Students.Include(s => s.KeepingBooks).FirstOrDefaultAsync(s => s.UserName == book.KeeperId);
 
                 Book addedBook = _lendingInfoDbContext.Books
-                    .Include(b=>b.Keeper).ThenInclude(s=>s.KeepingBooks)
+                    .Include(b => b.Keeper).ThenInclude(k => k.KeepingBooks)
                     .FirstOrDefault(b => b.BarCode == book.BarCode);
                 if (addedBook == null)
                 {
                     return RedirectToAction("Books", new { isbn = book.ISBN });
                 }
 
+                StudentInfo preStudent = addedBook.Keeper;
+                AppointmentOrLending targetLending =
+                    preStudent?.KeepingBooks.FirstOrDefault(b => b.BookId == addedBook.BarCode);
+
                 addedBook.AppointedLatestTime = book.AppointedLatestTime;
                 addedBook.State = book.State;
                 addedBook.BorrowTime = book.BorrowTime;
                 addedBook.MatureTime = null;
-                addedBook.Keeper?.KeepingBooks.Remove(addedBook);
+
+                preStudent?.KeepingBooks.Remove(targetLending);
 
                 if (addedBook.BorrowTime.HasValue)
                 {
@@ -552,17 +653,20 @@ namespace LibraryDemo.Controllers
                         return View(book);
                     }
                     if (student != null)
-                    {                        
-                        if (!student.KeepingBooks.Contains(addedBook))
+                    {
+                        if (student.KeepingBooks.Count >= student.MaxBooksNumber)
                         {
-                            if (student.KeepingBooks.Count >= student.MaxBooksNumber)
-                            {
-                                TempData["message"] = "该学生借书已超过上限";
-                            }
-
-                            book.State = BookState.Borrowed;
-                            student.KeepingBooks.Add(addedBook);
+                            TempData["message"] = "该学生借书已超过上限";
                         }
+
+                        addedBook.State = BookState.Borrowed;
+                        student.KeepingBooks.Add(new AppointmentOrLending()
+                        {
+                            BookId = addedBook.BarCode,
+                            StudentId = student.UserName
+                        });
+                        addedBook.Keeper = student;
+
                     }
                     addedBook.MatureTime = addedBook.BorrowTime + TimeSpan.FromDays(28);
                 }

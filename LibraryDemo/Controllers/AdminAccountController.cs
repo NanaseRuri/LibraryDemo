@@ -22,33 +22,12 @@ namespace LibraryDemo.Controllers
     public class AdminAccountController : Controller
     {
         private UserManager<Student> _userManager;
-        private SignInManager<Student> _signInManager;
 
-        public AdminAccountController(UserManager<Student> studentManager, SignInManager<Student> signInManager)
+        public AdminAccountController(UserManager<Student> userManager)
         {
-            _userManager = studentManager;
-            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
-        public IActionResult Index()
-        {
-            return View(CurrentAccountData());
-        }
-
-
-
-        Dictionary<string, object> CurrentAccountData()
-        {
-            var userName = HttpContext.User.Identity.Name;
-            var user = _userManager.FindByNameAsync(userName).Result;
-
-            return new Dictionary<string, object>()
-            {
-                ["学号"] = userName,
-                ["姓名"] = user.Name,
-                ["邮箱"] = user.Email,
-                ["手机号"] = user.PhoneNumber,
-            };
-        }
+        
     }
 }

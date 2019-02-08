@@ -18,5 +18,13 @@ namespace LibraryDemo.Data
         public DbSet<Bookshelf> Bookshelves { get; set; }
         public DbSet<RecommendedBook> RecommendedBooks { get; set; }
         public DbSet<StudentInfo> Students { get; set; }
+        public DbSet<AppointmentOrLending> AppointmentOrLendings { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<AppointmentOrLending>()
+                .HasKey(c => new { c.BookId, c.StudentId });
+        }
     }
 }
