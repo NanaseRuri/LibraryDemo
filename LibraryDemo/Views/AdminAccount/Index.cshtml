@@ -42,6 +42,23 @@
         }
     };
 
+    function addStudent() {
+        var studentList = $("#studentList");
+        if (!document.getElementById("studentInfo")) {
+            studentList.append('<tr id="studentInfo">' +
+                '<td></td>' +
+                '<td><input type="text" name="UserName" id="UserName" /></td>' +
+                '<td><input type="text" name="Name" id="Name" /></td>' +
+                '<td><input type="text" name="Degree" id="Degree" /></td>' +
+                '<td><input type="text" name="PhoneNumber" id="PhoneNumber" /></td>' +
+                '<td><input type="text" name="Email" id="Email" /></td>' +
+                '<td><input type="text" name="MaxBooksNumber" id="MaxBooksNumber" /></td>' +
+                '<td><button type="submit" onclick="return postAddStudent()">添加</button></td>' +
+                '</tr>');
+        }
+    }
+
+    
     function postAddStudent() {
         $.ajax({
             url: "@Url.Action("AddStudent")",
@@ -75,23 +92,6 @@
             `<td>${student.email}</td>` +
             `<td>${student.maxBooksNumber}</td >` +
             `</tr>`);
-
-    }
-
-    function addStudent() {
-        var studentList = $("#studentList");
-        if (!document.getElementById("studentInfo")) {
-            studentList.append('<tr id="studentInfo">' +
-                '<td></td>' +
-                '<td><input type="text" name="UserName" id="UserName" /></td>' +
-                '<td><input type="text" name="Name" id="Name" /></td>' +
-                '<td><input type="text" name="Degree" id="Degree" /></td>' +
-                '<td><input type="text" name="PhoneNumber" id="PhoneNumber" /></td>' +
-                '<td><input type="text" name="Email" id="Email" /></td>' +
-                '<td><input type="text" name="MaxBooksNumber" id="MaxBooksNumber" /></td>' +
-                '<td><button type="submit" onclick="return postAddStudent()">添加</button></td>' +
-                '</tr>');
-        }
     }
 </script>
 
