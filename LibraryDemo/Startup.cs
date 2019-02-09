@@ -103,7 +103,7 @@ namespace LibraryDemo
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=BookInfo}/{action=Index}");
             });
             StudentInitiator.InitialStudents(app.ApplicationServices).Wait();
             BookInitiator.BookInitial(app.ApplicationServices).Wait();

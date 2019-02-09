@@ -1,14 +1,141 @@
-﻿@model Dictionary<string,object>
+﻿@using LibraryDemo.Models.DomainModels
+@model IEnumerable<LibraryDemo.Models.DomainModels.Student>
 @{
     ViewData["Title"] = "AccountInfo";
+    Student stu = new Student();
 }
+<link rel="stylesheet" href="~/css/BookInfo.css" />
 
-<h2>AccountInfo</h2>
-
-<ul>
-    @foreach (var info in Model)
-    {
-        <li>@info.Key: @Model[info.Key]</li>
+<script>
+    function confirmDelete() {
+        var userNames = document.getElementsByName("userNames");
+        var message = "确认删除";
+        var values = [];
+        for (i in userNames) {
+            if (userNames[i].checked) {
+                message = message + userNames[i].value+",";
+                values.push(userNames[i].value);
+            }
+        }
+        message = message + "?";
+        if (confirm(message)) {
+            $.ajax({
+                url: "@Url.Action("RemoveStudent")",
+                contentType: "application/json",
+                method: "POST",
+                data: JSON.stringify(values),
+                success: function(students) {
+                    updateTable(students);
+                }
+            });
+        }
     }
-    
-</ul>
+
+    function updateTable(data) {
+        var body = $("#studentList");
+        body.empty();
+        for (var i = 0; i < data.length; i++) {
+            var person = data[i];
+            body.append(`<tr><td><input type="checkbox" name="userNames" value="${person.userName}" /></td>
+            <td>${person.userName}</td><td>${person.name}</td><td>${person.degree}</td>
+            <td>${person.phoneNumber}</td><td>${person.email}</td><td>${person.maxBooksNumber}</td></tr>`);
+        }
+    };
+
+    function postAddStudent() {
+        $.ajax({
+            url: "@Url.Action("AddStudent")",
+            contentType: "application/json",
+            method: "POST",
+            data: JSON.stringify({
+                UserName: $("#UserName").val(),
+                Name: $("#Name").val(),
+                Degree:$("#Degree").val(),
+                PhoneNumber: $("#PhoneNumber").val(),
+                Email: $("#Email").val(),
+                MaxBooksNumber: $("#MaxBooksNumber").val()
+            }),
+            success: function (student) {
+                addStudentToTable(student);
+            }
+        });
+    }
+
+    function addStudentToTable(student) {
+        var studentList = document.getElementById("studentList");
+        var studentInfo = document.getElementById("studentInfo");
+        studentList.removeChild(studentInfo);
+
+        $("#studentList").append(`<tr>` +
+            `<td><input type="checkbox" name="userNames" value="${student.userName}" /></td>` +
+            `<td>${student.userName}</td>` +
+            `<td>${student.name}</td>`+
+            `<td>${student.degree}</td>` +
+            `<td>${student.phoneNumber}</td>` +
+            `<td>${student.email}</td>` +
+            `<td>${student.maxBooksNumber}</td >` +
+            `</tr>`);
+
+    }
+
+    function addStudent() {
+        var studentList = $("#studentList");
+        if (!document.getElementById("studentInfo")) {
+            studentList.append('<tr id="studentInfo">' +
+                '<td></td>' +
+                '<td><input type="text" name="UserName" id="UserName" /></td>' +
+                '<td><input type="text" name="Name" id="Name" /></td>' +
+                '<td><input type="text" name="Degree" id="Degree" /></td>' +
+                '<td><input type="text" name="PhoneNumber" id="PhoneNumber" /></td>' +
+                '<td><input type="text" name="Email" id="Email" /></td>' +
+                '<td><input type="text" name="MaxBooksNumber" id="MaxBooksNumber" /></td>' +
+                '<td><button type="submit" onclick="return postAddStudent()">添加</button></td>' +
+                '</tr>');
+        }
+    }
+</script>
+
+<h2>学生信息</h2>
+
+<div id="buttonGroup">
+    <button class="btn btn-primary" onclick="return addStudent()">添加学生</button>
+    <button class="btn btn-danger" onclick="return confirmDelete()">删除学生</button>
+</div>
+
+
+<br />
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>@Html.LabelFor(m => stu.UserName)</th>
+            <th>@Html.LabelFor(m => stu.Name)</th>
+            <th>@Html.LabelFor(m => stu.Degree)</th>
+            <th>@Html.LabelFor(m => stu.PhoneNumber)</th>
+            <th>@Html.LabelFor(m => stu.Email)</th>
+            <th>@Html.LabelFor(m => stu.MaxBooksNumber)</th>
+        </tr>
+    </thead>
+    <tbody id="studentList">
+
+        @if (!@Model.Any())
+        {
+            <tr><td colspan="6">未有学生信息</td></tr>
+        }
+        else
+        {
+            foreach (var student in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" name="userNames" value="@student.UserName" /></td>
+                    <td>@student.UserName</td>
+                    <td>@student.Name</td>
+                    <td>@Html.DisplayFor(m => student.Degree)</td>
+                    <td>@student.PhoneNumber</td>
+                    <td>@student.Email</td>
+                    <td>@student.MaxBooksNumber</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

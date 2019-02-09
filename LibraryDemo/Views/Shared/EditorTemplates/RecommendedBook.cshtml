@@ -1,0 +1,23 @@
+﻿@model LibraryDemo.Models.DomainModels.RecommendedBook
+
+
+<div class="form-group">
+    @Html.DisplayFor(r=>r.ISBN)
+    @Html.EditorFor(r=>r.ISBN)
+</div>
+<div class="form-group">
+    @Html.DisplayFor(r => r.Name)
+    @Html.EditorFor(r => r.Name)
+</div>
+<div class="form-group">
+    @Html.DisplayFor(r=>r.Author)
+    @Html.EditorFor(r=>r.Author)
+</div>
+<div class="form-group">
+    @Html.DisplayFor(r=>r.Press)
+    @Html.EditorFor(r=>r.Press)
+</div>
+<div class="form-group">
+    @Html.DisplayFor(r=>r.PublishDateTime)
+    @Html.EditorFor(r=>r.PublishDateTime)
+</div>

@@ -222,7 +222,8 @@ namespace LibraryDemo.Controllers
 
         public IActionResult Recommend()
         {
-            return View();
+            RecommendedBook book=new RecommendedBook();            
+            return View(book);
         }
 
 

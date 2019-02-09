@@ -70,8 +70,8 @@ namespace LibraryDemo.Infrastructure
                 {
                     UserName = "A000000001",
                     Name = "Admin0001",
-                    Email = "980498809@qq.com",
-                    PhoneNumber = "15827411963",
+                    Email = "123456789@qq.com",
+                    PhoneNumber = "12345678910",
                     Degree = Degrees.CollegeStudent,
                     MaxBooksNumber = 20
                 },

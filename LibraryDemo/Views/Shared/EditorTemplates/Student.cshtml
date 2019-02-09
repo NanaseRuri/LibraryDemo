@@ -1,0 +1,25 @@
+﻿@model LibraryDemo.Models.DomainModels.Student
+
+<div>
+    
+    <div class="form-group">
+        @Html.LabelFor(s=>s.UserName)
+        @Html.EditorFor(s=>s.UserName)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(s=>s.Name)
+        @Html.EditorFor(s=>s.Name)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(s=>s.PhoneNumber)
+        @Html.EditorFor(s=>s.PhoneNumber)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(s=>s.Degree)
+        @Html.EditorFor(s=>s.Degree)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(s=>s.MaxBooksNumber)
+        @Html.EditorFor(s=>s.MaxBooksNumber)
+    </div>  
+</div>
