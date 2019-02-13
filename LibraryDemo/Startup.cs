@@ -5,17 +5,11 @@ using System.Threading.Tasks;
 using LibraryDemo.Data;
 using LibraryDemo.Infrastructure;
 using LibraryDemo.Models.DomainModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,23 +43,23 @@ namespace LibraryDemo
                 options.UseSqlServer(Configuration.GetConnectionString("StudentIdentityDbContext"));
             });
             services.AddIdentity<Student, IdentityRole>(opts =>
-                {
+            {
 
-                    opts.User.RequireUniqueEmail = true;
-                    opts.User.AllowedUserNameCharacters = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789";
-                    opts.Password.RequiredLength = 6;
-                    opts.Password.RequireNonAlphanumeric = false;
-                    opts.Password.RequireLowercase = false;
-                    opts.Password.RequireUppercase = false;
-                    opts.Password.RequireDigit = false;
-                }).AddEntityFrameworkStores<StudentIdentityDbContext>()
+                opts.User.RequireUniqueEmail = true;
+                opts.User.AllowedUserNameCharacters = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789";
+                opts.Password.RequiredLength = 6;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequireLowercase = false;
+                opts.Password.RequireUppercase = false;
+                opts.Password.RequireDigit = false;
+            }).AddEntityFrameworkStores<StudentIdentityDbContext>()
                 .AddDefaultTokenProviders();
             services.ConfigureApplicationCookie(opts =>
             {
                 opts.Cookie.HttpOnly = true;
                 opts.LoginPath = "/StudentAccount/Login";
                 opts.AccessDeniedPath = "/StudentAccount/Login";
-                opts.ExpireTimeSpan=TimeSpan.FromMinutes(5);
+                opts.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
             services.AddSingleton<EmailSender>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

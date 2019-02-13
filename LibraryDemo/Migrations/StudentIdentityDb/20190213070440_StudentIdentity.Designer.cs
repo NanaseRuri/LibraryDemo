@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryDemo.Migrations.StudentIdentityDb
 {
     [DbContext(typeof(StudentIdentityDbContext))]
-    [Migration("20190204082857_change")]
-    partial class change
+    [Migration("20190213070440_StudentIdentity")]
+    partial class StudentIdentity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

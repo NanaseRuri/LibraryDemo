@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LibraryDemo.Migrations.StudentIdentityDb
 {
-    public partial class StudentIdentityDbContext1 : Migration
+    public partial class StudentIdentity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,31 +40,14 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
                     UserName = table.Column<string>(maxLength: 256, nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    Degree = table.Column<int>(nullable: false),
-                    MaxBooksNumber = table.Column<int>(nullable: false),
-                    AppointingBookBarCode = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(maxLength: 14, nullable: true),
-                    Fine = table.Column<decimal>(nullable: false)
+                    Name = table.Column<string>(nullable: true),
+                    Degree = table.Column<int>(nullable: false),
+                    MaxBooksNumber = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Bookshelf",
-                columns: table => new
-                {
-                    BookshelfId = table.Column<int>(nullable: false),
-                    Sort = table.Column<string>(nullable: false),
-                    MinFetchNumber = table.Column<string>(nullable: false),
-                    MaxFetchNumber = table.Column<string>(nullable: false),
-                    Location = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookshelf", x => x.BookshelfId);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,40 +156,6 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Book",
-                columns: table => new
-                {
-                    BarCode = table.Column<string>(nullable: false),
-                    ISBN = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    FetchBookNumber = table.Column<string>(nullable: true),
-                    BookshelfId = table.Column<int>(nullable: false),
-                    BorrowTime = table.Column<DateTime>(nullable: true),
-                    MatureTime = table.Column<DateTime>(nullable: true),
-                    AppointedLatestTime = table.Column<DateTime>(nullable: true),
-                    State = table.Column<int>(nullable: false),
-                    KeeperId = table.Column<string>(nullable: true),
-                    Location = table.Column<string>(nullable: true),
-                    Sort = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Book", x => x.BarCode);
-                    table.ForeignKey(
-                        name: "FK_Book_Bookshelf_BookshelfId",
-                        column: x => x.BookshelfId,
-                        principalTable: "Bookshelf",
-                        principalColumn: "BookshelfId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Book_AspNetUsers_KeeperId",
-                        column: x => x.KeeperId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -245,16 +194,6 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Book_BookshelfId",
-                table: "Book",
-                column: "BookshelfId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Book_KeeperId",
-                table: "Book",
-                column: "KeeperId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -275,13 +214,7 @@ namespace LibraryDemo.Migrations.StudentIdentityDb
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Book");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "Bookshelf");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
