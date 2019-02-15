@@ -102,7 +102,6 @@ namespace LibraryDemo.Controllers
             return View(model);
         }
 
-        [Authorize]
         public IActionResult AccountInfo()
         {
             return View(CurrentAccountData());

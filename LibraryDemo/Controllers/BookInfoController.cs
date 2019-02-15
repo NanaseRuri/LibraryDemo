@@ -325,7 +325,7 @@ namespace LibraryDemo.Controllers
                 await _lendingInfoDbContext.SaveChangesAsync();
             }
             TempData["message"] = $"已移除书籍{sb.ToString()}";
-            return RedirectToAction("EditBookDetails");
+            return RedirectToAction("BookDetails");
         }
 
         [Authorize(Roles = "Admin")]
