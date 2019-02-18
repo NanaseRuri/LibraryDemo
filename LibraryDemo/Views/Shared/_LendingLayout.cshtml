@@ -56,24 +56,26 @@
             </div>
         </div>
     </nav>
+<div align="center">
+    <br />
+    <form action="@Url.Action("Search", "BookInfo")">
+        @Html.DropDownList("keyword", new List<SelectListItem>()
+        {
+            new SelectListItem("书名", "Name"),
+            new SelectListItem("ISBN", "ISBN"),
+            new SelectListItem("索书号", "FetchBookNumber"),
+        })
+        <input type="text" name="value"/>
+        <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+    </form>
+
     @if (TempData["message"] != null)
     {
-        <br />
+        <br/>
         <p class="text-success">@TempData["message"]</p>
+        <br/>
     }
-    <br />
-    <div align="center">
-        <form action="@Url.Action("Search","BookInfo")">
-            @Html.DropDownList("keyword",new List<SelectListItem>()
-            {
-                new SelectListItem("书名","Name"),
-                new SelectListItem("ISBN","ISBN"),
-                new SelectListItem("索书号","FetchBookNumber"),
-            })
-            <input type="text" name="value" />
-            <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
-        </form>
-    </div>
+</div>
     <partial name="_CookieConsentPartial" />
     <div class="container body-content">
 
