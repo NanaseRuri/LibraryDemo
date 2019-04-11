@@ -29,6 +29,7 @@ namespace LibraryDemo.Controllers
             _userManager = userManager;
         }
 
+        [ResponseCache(CacheProfileName = "Normal")]
         public IActionResult Index()
         {
             ICollection<Student> students = _userManager.Users.ToList();
@@ -46,6 +47,7 @@ namespace LibraryDemo.Controllers
                 return Json("Failed");
         }
 
+        [Authorize(Policy = "CompletedProbation")]
         public async Task<JsonResult> AddedStudent(string userName)
         {
             Student student=await _userManager.Users.FirstOrDefaultAsync(s => s.UserName == userName);

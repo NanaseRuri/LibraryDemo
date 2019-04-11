@@ -24,6 +24,11 @@ namespace LibraryDemo.Controllers
         private LendingInfoDbContext _lendingInfoDbContext;
         private static int amout = 4;
 
+        public string Test()
+        {
+            return "hee";
+        }
+
         public BookInfoController(LendingInfoDbContext context)
         {
             _lendingInfoDbContext = context;

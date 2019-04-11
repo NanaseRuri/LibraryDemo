@@ -1,0 +1,6 @@
+﻿@import '_color';
+.banner-text{
+    color:$main-text-color;
+    background-color:$light-background;
+    border:$primary-border-width solid $dark-border;
+}
