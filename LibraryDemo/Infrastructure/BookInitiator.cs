@@ -462,7 +462,7 @@ namespace LibraryDemo.Infrastructure
                     {
                         UserName = "A000000001",
                         Name = "Admin0001",
-                        PhoneNumber = "15827411963",
+                        PhoneNumber = "1234568913",
                         Degree = Degrees.CollegeStudent,
                         MaxBooksNumber = 20
                     },
